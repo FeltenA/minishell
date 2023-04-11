@@ -1,4 +1,14 @@
-
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   minishell.h                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: afelten <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/04/11 14:12:12 by afelten           #+#    #+#             */
+/*   Updated: 2023/04/11 14:12:17 by afelten          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
@@ -6,6 +16,8 @@
 # include <unistd.h>
 # include <stdlib.h>
 # include <stdio.h>
+# include <fcntl.h>
+# include <errno.h>
 # include <readline/readline.h>
 # include <readline/history.h>
 
@@ -76,8 +88,19 @@ int		set_quote_status(int status, char c);
 
 void	error_msg(char *msg, char *token, int quoting);
 
-void    free_tokens(t_token *tokens);
-void    free_data(t_data *data);
+void	free_tokens(t_token *tokens);
+void	free_data(t_data *data);
 void	free_str_array(char **strs);
+
+char	*get_var_env(char **env, char *var);
+int		get_var_size(char **env, char *var);
+
+int		replace_var(t_data *data, char **str, int heredoc);
+
+int		rm_quotes(char **str);
+
+int		init_parse_io(t_command *command, t_token **token, int input);
+
+void	free_output(t_command *command);
 
 #endif

@@ -1,4 +1,14 @@
-
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   parser.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: afelten <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/04/11 14:14:03 by afelten           #+#    #+#             */
+/*   Updated: 2023/04/11 14:14:06 by afelten          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "minishell.h"
 
@@ -24,7 +34,7 @@ t_command	*init_command(void)
 
 void	add_command(t_command **commands, t_command *new)
 {
-	t_commands	*list;
+	t_command	*list;
 
 	list = *commands;
 	while (list && list->next)
@@ -34,24 +44,24 @@ void	add_command(t_command **commands, t_command *new)
 	else
 	{
 		list->next = new;
-		new->prev = list:
+		new->prev = list;
 	}
 }
 
 int	fill_command(t_command *command, t_token **token)
 {
 	if ((*token)->type == TRUNC)
-		return (parse_trunc(new, token));
+		return (parse_trunc(command, token));
 	else if ((*token)->type == APPEND)
-		return (parse_append(new, token));
+		return (parse_append(command, token));
 	else if ((*token)->type == INPUT)
-		return (parse_input(new, token));
+		return (parse_input(command, token));
 	else if ((*token)->type == HEREDOC)
-		return (parse_heredoc(new, token));
-	else if (!str)
-		return (parse_command(new, *token));
+		return (parse_heredoc(command, token));
+	else if (!command->str)
+		return (parse_command(command, *token));
 	else
-		return (add_arg_command(new, *token));
+		return (add_arg_command(command, *token));
 }
 
 int	create_command(t_data *data, t_token **tokens)
@@ -62,11 +72,11 @@ int	create_command(t_data *data, t_token **tokens)
 	if (!new)
 		return (0);
 	add_command(&data->commands, new);
-	while (*token && (*token)->type != PIPE && (*token)->type != END)
+	while (*tokens && (*tokens)->type != PIPE && (*tokens)->type != END)
 	{
-		if (!fill_command(new, token))
+		if (!fill_command(new, tokens))
 			return (0);
-		*token = (*token)->next;
+		*tokens = (*tokens)->next;
 	}
 	return (1);
 }
