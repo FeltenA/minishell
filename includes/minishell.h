@@ -104,4 +104,7 @@ int		init_parse_io(t_command *command, t_token **token, int input);
 
 void	free_output(t_command *command);
 
+t_command	*init_command(void);
+void		add_command(t_command **commands, t_command *new);
+
 #endif

@@ -12,40 +12,19 @@
 
 #include "minishell.h"
 
-t_command	*init_command(void)
+int	add_arg_command(t_command *command, t_token *token)
 {
-	t_command	*command;
-
-	command = malloc(sizeof(t_command));
-	if (!command)
-		return (0);
-	command->str = 0;
-	command->args = 0;
-	command->pipe = 0;
-	command->prev = 0;
-	command->next = 0;
-	command->io_data.infile = 0;
-	command->io_data.outfile = 0;
-	command->io_data.heredoc_del = 0;
-	command->io_data.in_fd = -1;
-	command->io_data.out_fd = -1;
-	return (command);
-}
-
-void	add_command(t_command **commands, t_command *new)
-{
-	t_command	*list;
-
-	list = *commands;
-	while (list && list->next)
-		list = list->next;
-	if (!list)
-		*commands = new;
-	else
+	if (!command->args)
 	{
-		list->next = new;
-		new->prev = list;
+		command->args = malloc(sizeof(char *));
+		if (!command->args)
+			return (0);
+		command->args[0] = 0;
 	}
+	command->args = add_str_arr(command->args, token->str);
+	if (!command->args)
+		return (0);
+	return (1);
 }
 
 int	fill_command(t_command *command, t_token **token)
@@ -59,9 +38,10 @@ int	fill_command(t_command *command, t_token **token)
 	else if ((*token)->type == HEREDOC)
 		return (parse_heredoc(command, token));
 	else if (!command->str)
-		return (parse_command(command, *token));
+		command->str = (*token)->str;
 	else
 		return (add_arg_command(command, *token));
+	return (1);
 }
 
 int	create_command(t_data *data, t_token **tokens)

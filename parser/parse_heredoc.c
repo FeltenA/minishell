@@ -77,5 +77,12 @@ int	parse_heredoc(t_command *command, t_token **token, char **env)
 	if (!command->io_data.infile)
 		return (0);
 	command->io_data.heredoc_del = (*token)->str;
-    if (create_heredoc(env, command->io_data.infile, &command->io_data.heredoc_del))
+    if (create_heredoc(env, command->io_data.infile,
+			&command->io_data.heredoc_del))
+		return (0);
+	command->io_data.in_fd = open(command->io_data.infile,
+			O_RDONLY, 0664);
+	if (command->io_data.in_fd < 0)
+		return (0);
+	return (1);
 }

@@ -19,6 +19,7 @@ void	free_input(t_command *command)
 	if (command->io_data.heredoc_del)
 	{
 		unlink(command->io_data.infile);
+		free(command->io_data.infile);
 		free(command->io_data.heredoc_del);
 		command->io_data.heredoc_del = 0;
 	}

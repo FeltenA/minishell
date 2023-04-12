@@ -57,7 +57,7 @@ int	init_data(t_data *data, char **env)
 	if (!copy_env(data, env))
 	{
 		free_str_array(data->env);
-		ft_putstr_fd("minishell: Environment initialisation unsuccessful");
+		ft_putstr_fd("minishell: Environment initialisation unsuccessful", 2);
 		return (0);
 	}
 	data->line = 0;
@@ -79,7 +79,7 @@ void	print_tokens(t_data *data)
 	}
 }
 
-int	minishell_inter(char **env)
+int	minishell_inter(t_data *data)
 {
 	char	*line;
 
@@ -89,14 +89,14 @@ int	minishell_inter(char **env)
 		line = readline("minishell> ");
 		if (!line || !line[0] || check_line(line))
 			continue ;
-		data.line = line;
+		data->line = line;
 		add_history(line);
-		if (!lexer(&data))
+		if (!lexer(data))
 		{
-			data.status = 2;
+			data->status = 2;
 			continue ;
 		}
-		print_tokens(&data);
+		print_tokens(data);
 	}
 }
 

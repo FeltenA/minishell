@@ -3,7 +3,8 @@ SRCS	=	lexer/lexer.c\
 			lexer/check_error.c\
 			lexer/lexer_utils.c\
 			error.c\
-			main.c
+			main.c\
+			free.c
 
 OBJS	= ${SRCS:.c=.o}
 
