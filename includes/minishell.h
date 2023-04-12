@@ -98,6 +98,7 @@ int		get_var_size(char **env, char *var);
 int		replace_var(t_data *data, char **str, int heredoc);
 
 int		rm_quotes(char **str);
+int		get_nbr_quotes(char *str);
 
 int		init_parse_io(t_command *command, t_token **token, int input);
 
