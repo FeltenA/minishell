@@ -95,7 +95,7 @@ void	free_str_array(char **strs);
 char	*get_var_env(char **env, char *var);
 int		get_var_size(char **env, char *var);
 
-int		replace_var(t_data *data, char **str, int heredoc);
+int		replace_var(char **str, int heredoc, char **env);
 
 int		rm_quotes(char **str);
 int		get_nbr_quotes(char *str);

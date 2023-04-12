@@ -105,17 +105,17 @@ int	fill_newstr(char *newstr, char *str, char **env, int heredoc)
 	return (1);
 }
 
-int	replace_var(t_data *data, char **str, int heredoc)
+int	replace_var(char **str, int heredoc, char **env)
 {
 	char	*newstr;
 
-	if (heredoc == DQUOTE || !check_var(str, heredoc))
+	if (heredoc > DEFAULT || !check_var(str, heredoc))
 		return (1);
-	newstr = malloc((get_new_word_size(data->env, *str, heredoc) + 1)
+	newstr = malloc((get_new_word_size(env, *str, heredoc) + 1)
 			* sizeof(char));
 	if (!newstr)
 		return (0);
-	if (!fill_newstr(newstr, *str, data->env, heredoc))
+	if (!fill_newstr(newstr, *str, env, heredoc))
 	{
 		free(newstr);
 		return (0);
