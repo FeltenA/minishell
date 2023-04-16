@@ -12,8 +12,6 @@
 
 #include "minishell.h"
 
-int	is_space(char c);
-
 int	check_line(char *line)
 {
 	int	i;
@@ -25,48 +23,11 @@ int	check_line(char *line)
 			return (0);
 		i++;
 	}
+	free(line);
 	return (1);
 }
 
-int	copy_env(t_data *data, char **env)
-{
-	int	i;
-
-	i = 0;
-	if (!env)
-		return (0);
-	while (env[i])
-		i++;
-	data->env = malloc(sizeof(char *) * (i + 1));
-	if (!data->env)
-		return (0);
-	i = 0;
-	while (env[i])
-	{
-		data->env[i] = ft_strdup(env[i]);
-		if (!data->env[i])
-			return (0);
-		i++;
-	}
-	return (1);
-}
-
-int	init_data(t_data *data, char **env)
-{
-	data->env = 0;
-	if (!copy_env(data, env))
-	{
-		free_str_array(data->env);
-		ft_putstr_fd("minishell: Environment initialisation unsuccessful", 2);
-		return (0);
-	}
-	data->line = 0;
-	data->status = 0;
-	data->tokens = 0;
-	data->commands = 0;
-	return (1);
-}
-
+/*
 void	print_tokens(t_data *data)
 {
 	t_token	*token;
@@ -79,6 +40,46 @@ void	print_tokens(t_data *data)
 	}
 }
 
+void	print_cmd(t_data *data)
+{
+	t_command	*cmd;
+	char		**str;
+
+	cmd = data->commands;
+	while (cmd)
+	{
+		if (cmd->str)
+			printf("%s\n", cmd->str);
+		str = cmd->args;
+		while (str)
+		{
+			printf("%s ", *str);
+			str++;
+		}
+		printf("\n");
+		printf("%s : %d\n", cmd->io_data.infile, cmd->io_data.in_fd);
+		if (cmd->io_data.heredoc_del)
+			printf("%s\n", cmd->io_data.heredoc_del);
+		printf("%s : %d\n", cmd->io_data.outfile, cmd->io_data.out_fd);
+		cmd = cmd->next;
+	}
+}*/
+
+void	use_input(t_data *data)
+{
+	if (!lexer(data))
+	{
+		data->status = 2;
+		return ;
+	}
+	if (!parser(data))
+	{
+		data->status = 1;
+		return ;
+	}
+	execution(data);
+}
+
 int	minishell_inter(t_data *data)
 {
 	char	*line;
@@ -86,17 +87,16 @@ int	minishell_inter(t_data *data)
 	while (1)
 	{
 		free_data(data);
+		set_signals_interactive();
 		line = readline("minishell> ");
-		if (!line || !line[0] || check_line(line))
+		if (!line)
+			exit_shell(data);
+		if (!line[0] || check_line(line))
 			continue ;
+		set_signals_noninteractive();
 		data->line = line;
 		add_history(line);
-		if (!lexer(data))
-		{
-			data->status = 2;
-			continue ;
-		}
-		print_tokens(data);
+		use_input(data);
 	}
 }
 

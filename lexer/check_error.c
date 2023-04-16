@@ -22,13 +22,14 @@ int	check_syntax(t_data *data, int end)
 	if (token)
 	{
 		if ((token->type >= PIPE && token->type != END
-				&& token->prev && token->prev->type >= PIPE)
-			|| (token->type == PIPE && !token->prev))
+				&& token->prev && token->prev->type > PIPE)
+			|| (token->type == PIPE
+				&& (!token->prev || token->prev->type >= PIPE)))
 		{
 			error_msg("syntax error near unexpected token", token->str, 1);
 			return (1);
 		}
-		if (end)
+		if (end && token->type != WORD && token->type != END)
 		{
 			if (token->type > PIPE && token->type != END)
 				error_msg("syntax error near unexpected token", "newline", 1);

@@ -1,126 +1,131 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   var_expansion.c                                    :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: afelten <marvin@42.fr>                     +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/04/11 14:14:20 by afelten           #+#    #+#             */
-/*   Updated: 2023/04/11 14:14:24 by afelten          ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
+
 
 #include "minishell.h"
 
-int	get_new_word_size(char **env, char *str, int heredoc)
+int	split_var(t_exp_var *values, char *str, int len_var);
+
+static int	check_var(char *str, t_exp_var *values)
 {
 	int	i;
-	int	size;
-	int	quotes;
 
 	i = 0;
-	size = 0;
-	quotes = DEFAULT;
 	while (str[i])
 	{
 		if (str[i] == '\'' || str[i] == '\"')
-			quotes = set_quote_status(quotes, str[i]);
-		else if (str[i] == '$' && ft_isalnum(str[i + 1])
-			&& (quotes != SQUOTE || heredoc == DEFAULT))
-		{
-			i++;
-			size += get_var_size(env, &str[i]);
-			while (str[i] && ft_isalnum(str[i]))
-				i++;
-			continue ;
-		}
-		i++;
-		size++;
-	}
-	return (size);
-}
-
-int	check_var(char *str, int heredoc)
-{
-	int	i;
-	int	quotes;
-
-	i = 0;
-	quotes = DEFAULT;
-	while (str[i])
-	{
-		if (str[i] == '\'' || str[i] == '\"')
-			quotes = set_quote_status(quotes, str[i]);
-		else if (str[i] == '$' && ft_isalnum(str[i + 1])
-			&& (quotes != SQUOTE || heredoc == DEFAULT))
+			values->status = set_quote_status(values->status, str[i]);
+		else if (str[i] == '$' && (ft_isalpha(str[i + 1]) || str[i + 1] == '_'
+				|| str[i + 1] == '?') && values->status != SQUOTE)
 			return (1);
 		i++;
 	}
 	return (0);
 }
 
-int	copy_var_env(char *str, char *var, int *i)
+void	get_index_var(char *str, t_exp_var *values)
 {
-	int	j;
+	int	i;
+	int	status;
 
-	j = 0;
-	if (!var)
-		return (0);
-	while (var[j])
+	status = values->status;
+	i = 0;
+	while (str[i])
 	{
-		str[*i] = var[j];
-		*i += 1;
-		j++;
+		if (str[i] == '\'' || str[i] == '\"')
+			status = set_quote_status(status, str[i]);
+		else if (str[i] == '$' && (ft_isalpha(str[i + 1]) || str[i + 1] == '_'
+				|| str[i + 1] == '?') && values->status != SQUOTE)
+		{
+			values->start = i + values->pos;
+			i += 2;
+			if (str[i - 1] != '?')
+				while (ft_isalnum(str[i]))
+					i++;
+			values->end = i + values->pos;
+			return ;
+		}
+		i++;
 	}
+	values->start = 0;
+	values->end = 0;
+}
+
+int	replace_var(char **str, char *var, int start, int end)
+{
+	char	*newstr;
+	int		i[3];
+
+	newstr = malloc(sizeof(char) * (ft_strlen(*str)
+				- (start - end) + ft_strlen(var)));
+	if (!newstr)
+		return (!free_return(*str) && free_return(var));
+	i[0] = -1;
+	i[1] = -1;
+	i[2] = -1;
+	while (++i[0] < start && (*str)[i[0]])
+		newstr[++i[1]] = (*str)[i[0]];
+	while (var[++i[2]])
+		newstr[++i[1]] = var[i[2]];
+	i[0] = end - 1;
+	while ((*str)[++i[0]])
+		newstr[++i[1]] = (*str)[i[0]];
+	newstr[i[1] + 1] = 0;
+	free(*str);
+	*str = newstr;
 	free(var);
 	return (1);
 }
 
-int	fill_newstr(char *newstr, char *str, char **env, int heredoc)
+char	**replace_first_var(t_exp_var *values)
 {
-	int	i;
-	int	j;
-	int	quotes;
+	char	*var;
+	int		len_var;
+	int		len_args;
 
-	i = 0;
-	j = 0;
-	quotes = DEFAULT;
-	while (str[i])
+	len_args = ft_strs_len(values->args);
+	get_index_var(values->args[len_args - 1] + values->pos, values);
+	var = get_var_env(values->data,
+			values->args[len_args - 1] + values->start + 1);
+	if (!var)
+		return (0);
+	len_var = ft_strlen(var);
+	if (!replace_var(&values->args[len_args - 1],
+			var, values->start, values->end))
+		return (0);
+	if (values->status == DQUOTE || !values->args[len_args - 1][0])
 	{
-		if (str[i] == '\'' || str[i] == '\"')
-			quotes = set_quote_status(quotes, str[i]);
-		else if (str[i] == '$' && ft_isalnum(str[i + 1])
-			&& (quotes != SQUOTE || heredoc == DEFAULT))
-		{
-			if (!copy_var_env(newstr, get_var_env(env, &str[i + 1]), &j))
-				return (0);
-			while (str[i] && ft_isalnum(str[i]))
-				i++;
-		}
-		newstr[j] = str[i];
-		i++;
-		j++;
+		values->pos = values->start + len_var;
+		return (values->args);
 	}
-	newstr[j] = 0;
-	return (1);
+	var = values->args[len_args - 1];
+	values->args[len_args - 1] = 0;
+	if (!split_var(values, var, len_var))
+		return (0);
+	return (values->args);
 }
 
-int	replace_var(char **str, int heredoc, char **env)
+char	**expand_var(t_data *data, char *str)
 {
-	char	*newstr;
+	t_exp_var	values;
 
-	if (heredoc > DEFAULT || !check_var(str, heredoc))
-		return (1);
-	newstr = malloc((get_new_word_size(env, *str, heredoc) + 1)
-			* sizeof(char));
-	if (!newstr)
+	values.data = data;
+	values.args = malloc(sizeof(char *) * 2);
+	if (!values.args)
 		return (0);
-	if (!fill_newstr(newstr, *str, env, heredoc))
+	values.args[0] = ft_strdup(str);
+	values.args[1] = 0;
+	if (!values.args[0])
 	{
-		free(newstr);
+		free(values.args);
 		return (0);
 	}
-	free(*str);
-	*str = newstr;
-	return (1);
+	values.pos = 0;
+	values.status = DEFAULT;
+	while (check_var(values.args[ft_strs_len(values.args) - 1] + values.pos,
+			&values))
+	{
+		values.args = replace_first_var(&values);
+		if (!values.args)
+			return (0);
+	}
+	return (values.args);
 }

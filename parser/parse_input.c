@@ -18,42 +18,56 @@ void	free_input(t_command *command)
 		close(command->io_data.in_fd);
 	if (command->io_data.heredoc_del)
 	{
-		unlink(command->io_data.infile);
-		free(command->io_data.infile);
 		free(command->io_data.heredoc_del);
-		command->io_data.heredoc_del = 0;
+		unlink(command->io_data.infile);
 	}
+	if (command->io_data.infile)
+		free(command->io_data.infile);
+	command->io_data.heredoc_del = 0;
 	command->io_data.infile = 0;
 	command->io_data.in_fd = -1;
 }
 
-int	init_parse_io(t_command *command, t_token **token, int input)
+int	init_parse_io(t_command *command, t_token **token, int input, t_data *data)
 {
+	char	**strs;
+
 	*token = (*token)->next;
-	if (!ft_strlen((*token)->str))
+	strs = expand_var(data, (*token)->str);
+	if (!strs)
+		return (0);
+	if (ft_strs_len(strs) > 1 || !strs[0][0])
 	{
-		ft_putstr_fd("ambiguous redirect", 2);
+		free_str_array(strs);
+		print_error(1, (*token)->str, "ambiguous redirect");
 		return (0);
 	}
 	if (input)
+	{
 		free_input(command);
+		command->io_data.infile = strs[0];
+	}
 	else
+	{
 		free_output(command);
+		command->io_data.outfile = strs[0];
+	}
+	free(strs);
 	return (1);
 }
 
-int	parse_input(t_command *command, t_token **token)
+int	parse_input(t_command *command, t_token **token, t_data *data)
 {
-	if (init_parse_io(command, token, 1))
+	if (!init_parse_io(command, token, 1, data))
 		return (0);
-	if (!rm_quotes(&((*token)->str)))
+	if (get_nbr_quotes(command->io_data.infile)
+		&& !rm_quotes(&(command->io_data.infile)))
 		return (0);
-	command->io_data.infile = (*token)->str;
 	command->io_data.in_fd = open(command->io_data.infile,
 			O_RDONLY, 0664);
 	if (command->io_data.in_fd < 0)
 	{
-		ft_putstr_fd(strerror(errno), 2);
+		print_error(1, command->io_data.infile, strerror(errno));
 		return (0);
 	}
 	return (1);

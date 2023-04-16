@@ -12,45 +12,65 @@
 
 #include "minishell.h"
 
-char	*get_var_env(char **env, char *var)
+char	*get_var_env(t_data *data, char *var)
 {
 	int		i;
 	int		j;
-	char	*var;
+	char	*val;
 
 	i = 0;
-	while (var[i] && ft_isalnum(var[i]))
+	if (var[i] && var[i] == '?')
+		return (ft_itoa(data->status));
+	while (var[i] && (ft_isalnum(var[i]) || var[i] == '_'))
 		i++;
 	j = 0;
-	while (env[j])
+	while (data->env[j])
 	{
-		if (ft_strncmp(env[j], var, i))
+		if (!ft_strncmp(data->env[j], var, i))
 		{
-			var = ft_strdup(env[j] + i + 1);
-			if (!var)
+			val = ft_strdup(data->env[j] + i + 1);
+			if (!val)
 				return (0);
-			return (var);
+			return (val);
 		}
 		j++;
 	}
-	return (0);
+	return (ft_strdup(""));
 }
 
-int	get_var_size(char **env, char *var)
+static int	get_int_size(int nbr)
+{
+	int	size;
+
+	size = 0;
+	if (!nbr)
+		return (1);
+	while (nbr)
+	{
+		nbr /= 10;
+		size++;
+	}
+	return (size);
+}
+
+int	get_var_size(t_data *data, char *var)
 {
 	int		i;
 	int		j;
 	int		size;
 
 	i = 0;
-	while (var[i] && ft_isalnum(var[i]))
+	size = 0;
+	if (var[i] && var[i] == '?')
+		return (get_int_size(data->status));
+	while (var[i] && (ft_isalnum(var[i]) || var[i] == '_'))
 		i++;
 	j = 0;
-	while (env[j])
+	while (data->env[j])
 	{
-		if (ft_strncmp(env[j], var, i))
+		if (!ft_strncmp(data->env[j], var, i))
 		{
-			while (env[j] + i + 1 + size)
+			while (*(data->env[j] + i + 1 + size))
 				size++;
 			return (size);
 		}

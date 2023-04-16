@@ -12,8 +12,6 @@
 
 #include "minishell.h"
 
-int		check_syntax(t_data *data, int end);
-
 int	get_operator(t_data *data, int *i)
 {
 	int		type;

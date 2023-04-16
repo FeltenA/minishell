@@ -16,39 +16,39 @@ void	free_output(t_command *command)
 {
 	if (command->io_data.out_fd != -1)
 		close(command->io_data.out_fd);
+	if (command->io_data.outfile)
+		free(command->io_data.outfile);
 	command->io_data.outfile = 0;
 	command->io_data.out_fd = -1;
 }
 
-int	parse_append(t_command *command, t_token **token)
+int	parse_append(t_command *command, t_token **token, t_data *data)
 {
-	if (init_parse_io(command, token, 0))
+	if (!init_parse_io(command, token, 0, data))
 		return (0);
-	if (!rm_quotes(&((*token)->str)))
+	if (get_nbr_quotes((*token)->str) && !rm_quotes(&((*token)->str)))
 		return (0);
-	command->io_data.outfile = (*token)->str;
 	command->io_data.out_fd = open(command->io_data.outfile,
 			O_WRONLY | O_CREAT | O_TRUNC, 0664);
 	if (command->io_data.out_fd < 0)
 	{
-		ft_putstr_fd(strerror(errno), 2);
+		print_error(1, command->io_data.outfile, strerror(errno));
 		return (0);
 	}
 	return (1);
 }
 
-int	parse_trunc(t_command *command, t_token **token)
+int	parse_trunc(t_command *command, t_token **token, t_data *data)
 {
-	if (init_parse_io(command, token, 0))
+	if (!init_parse_io(command, token, 0, data))
 		return (0);
-	if (!rm_quotes(&((*token)->str)))
+	if (get_nbr_quotes((*token)->str) && !rm_quotes(&((*token)->str)))
 		return (0);
-	command->io_data.outfile = (*token)->str;
 	command->io_data.out_fd = open(command->io_data.outfile,
 			O_WRONLY | O_CREAT | O_APPEND, 0664);
 	if (command->io_data.out_fd < 0)
 	{
-		ft_putstr_fd(strerror(errno), 2);
+		print_error(1, command->io_data.outfile, strerror(errno));
 		return (0);
 	}
 	return (1);

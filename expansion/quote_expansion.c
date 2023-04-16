@@ -26,7 +26,7 @@ int	get_nbr_quotes(char *str)
 	{
 		save = status;
 		if (str[i] == '\'' || str[i] == '\"')
-			set_quote_status(status, str[i]);
+			status = set_quote_status(status, str[i]);
 		if (save != status)
 			nbr_quotes++;
 		i++;
@@ -52,8 +52,8 @@ int	rm_quotes(char **str)
 	while ((*str)[++i])
 	{
 		save = status;
-		if (str[i] == '\'' || str[i] == '\"')
-			set_quote_status(status, str[i]);
+		if ((*str)[i] == '\'' || (*str)[i] == '\"')
+			status = set_quote_status(status, (*str)[i]);
 		if (save == status)
 			newstr[++j] = (*str)[i];
 	}

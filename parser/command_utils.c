@@ -21,7 +21,8 @@ t_command	*init_command(void)
 		return (0);
 	command->str = 0;
 	command->args = 0;
-	command->pipe = 0;
+	command->pipe_fd[0] = -1;
+	command->pipe_fd[1] = -1;
 	command->prev = 0;
 	command->next = 0;
 	command->io_data.infile = 0;
@@ -46,4 +47,49 @@ void	add_command(t_command **commands, t_command *new)
 		list->next = new;
 		new->prev = list;
 	}
+}
+
+char	**add_str_arr(char **strs, char *str)
+{
+	int		i;
+	char	**newstrs;
+
+	i = 0;
+	while (strs[i])
+		i++;
+	newstrs = malloc(sizeof(char *) * (i + 2));
+	if (!newstrs)
+		return (0);
+	i = -1;
+	while (strs[++i])
+		newstrs[i] = strs[i];
+	newstrs[i] = str;
+	newstrs[i + 1] = 0;
+	free(strs);
+	return (newstrs);
+}
+
+char	**add_strs_to_array(char **strs1, char **strs2)
+{
+	char	**newstrs;
+	int		i;
+	int		j;
+
+	newstrs = malloc(sizeof(char *)
+			* (ft_strs_len(strs1) + ft_strs_len(strs2) + 1));
+	if (!newstrs)
+	{
+		free_str_array(strs1);
+		return (0);
+	}
+	i = -1;
+	j = -1;
+	while (strs1[++i])
+		newstrs[++j] = strs1[i];
+	i = -1;
+	while (strs2[++i])
+		newstrs[++j] = strs2[i];
+	newstrs[j + 1] = 0;
+	free(strs1);
+	return (newstrs);
 }
