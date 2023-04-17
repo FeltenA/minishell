@@ -44,44 +44,63 @@ int	exec_first_builtin(t_command **cmd, t_data *data)
 	save_out = -1;
 	if ((*cmd)->io_data.in_fd != -1)
 		save_in = dup(0);
-	if ((*cmd)->io_data.out_fd != -1 || (*cmd)->pipe_fd[1] != -1)
+	if ((*cmd)->io_data.out_fd != -1)
 		save_out = dup(1);
 	if (!redirect_io(*cmd, data))
 		return (0);
 	data->status = execute_builtin(data, *cmd);
 	if (save_in != -1)
+	{
 		dup2(save_in, 0);
+		close(save_in);
+	}
 	if (save_out != -1)
+	{
 		dup2(save_out, 1);
-	if (data->status != 0)
-		return (0);
+		close(save_out);
+	}
 	*cmd = (*cmd)->next;
 	return (1);
 }
 
+int	has_pipe(t_data *data)
+{
+	t_token	*token;
+
+	token = data->tokens;
+	while (token)
+	{
+		if (token->type == PIPE)
+			return (1);
+		token = token->next;
+	}
+	return (0);
+}
+
 int	execution(t_data *data)
 {
-	t_command	*commands;
+	t_command	*cmd;
 	pid_t		pid;
 
 	if (!create_pipes(data->commands, data))
 		return (0);
-	commands = data->commands;
-	if (is_builtin(commands->str) && !exec_first_builtin(&commands, data))
+	cmd = data->commands;
+	if (cmd && cmd->str && !has_pipe(data) && is_builtin(cmd->str)
+		&& !exec_first_builtin(&cmd, data))
 		return (0);
-	while (commands)
+	while (cmd)
 	{
-		if (!commands->str)
+		if (!cmd->str)
 		{
-			commands = commands->next;
+			cmd = cmd->next;
 			continue ;
 		}
 		pid = fork();
 		if (pid == -1)
 			return (perror_return(data, "fork: "));
 		else if (pid == 0)
-			execute_command(data, commands);
-		commands = commands->next;
+			execute_command(data, cmd);
+		cmd = cmd->next;
 	}
 	data->status = wait_children(data);
 	return (1);

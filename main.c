@@ -23,7 +23,6 @@ int	check_line(char *line)
 			return (0);
 		i++;
 	}
-	free(line);
 	return (1);
 }
 
@@ -82,20 +81,17 @@ void	use_input(t_data *data)
 
 int	minishell_inter(t_data *data)
 {
-	char	*line;
-
 	while (1)
 	{
 		free_data(data);
 		set_signals_interactive();
-		line = readline("minishell> ");
-		if (!line)
+		data->line = readline("minishell> ");
+		if (!data->line)
 			exit_shell(data);
-		if (!line[0] || check_line(line))
+		if (!data->line[0] || check_line(data->line))
 			continue ;
 		set_signals_noninteractive();
-		data->line = line;
-		add_history(line);
+		add_history(data->line);
 		use_input(data);
 	}
 }

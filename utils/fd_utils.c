@@ -49,7 +49,7 @@ int	redirect_io(t_command *command, t_data *data)
 	else if (command->pipe_fd[0] != -1)
 		fd_in = command->pipe_fd[0];
 	if (command->io_data.outfile)
-		fd_in = command->io_data.out_fd;
+		fd_out = command->io_data.out_fd;
 	else if (command->pipe_fd[1] != -1)
 		fd_out = command->pipe_fd[1];
 	if (fd_in != -1)

@@ -63,7 +63,8 @@ int	get_word(t_data *data, int *i)
 
 	len = 0;
 	status = DEFAULT;
-	while (data->line[*i] && (!is_space(data->line[*i]) || status))
+	while (data->line[*i] && ((!is_space(data->line[*i])
+				&& !is_operator(&data->line[*i])) || status))
 	{
 		if (data->line[*i] == '\"' || data->line[*i] == '\'')
 			status = set_quote_status(status, data->line[*i]);
