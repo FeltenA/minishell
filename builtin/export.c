@@ -6,7 +6,7 @@
 /*   By: qrolland <qrolland@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/14 21:29:20 by qrolland          #+#    #+#             */
-/*   Updated: 2023/04/14 21:42:15 by qrolland         ###   ########.fr       */
+/*   Updated: 2023/04/17 17:11:41 by qrolland         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ int	export_builtin(t_data *data, char **strs)
 	{
 		if (!check_env_var(strs[i]))
 		{
-			error_cmd("export", strs[i], "not a valid identifier", 0);
+			error_cmd("export", strs[i], "not a valid identifier", 1);
 			return (1);
 		}
 		else if (ft_strchr(strs[i], '=') != NULL)

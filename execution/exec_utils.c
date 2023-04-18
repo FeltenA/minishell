@@ -1,3 +1,14 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   exec_utils.c                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: afelten <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/04/17 14:50:46 by afelten           #+#    #+#             */
+/*   Updated: 2023/04/17 14:50:51 by afelten          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "minishell.h"
 
@@ -40,11 +51,7 @@ char	**get_path(t_data *data)
 	if (data->env[i])
 		path = ft_split(data->env[i] + 5, ':');
 	if (!data->env[i] || !path)
-	{
-		data->status = 1;
-		ft_putstr_fd("child: failed to initialise PATH\n", 2);
 		return (0);
-	}
 	return (path);
 }
 

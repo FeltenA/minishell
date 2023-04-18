@@ -73,7 +73,7 @@ int	get_word(t_data *data, int *i)
 	}
 	if (status != DEFAULT)
 	{
-		if (data->line[*i - len] == '\"')
+		if (status == DQUOTE)
 			error_msg("unexpected EOF while looking for matching", "\"", 1);
 		else
 			error_msg("unexpected EOF while looking for matching", "\'", 1);

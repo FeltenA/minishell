@@ -6,7 +6,7 @@
 /*   By: qrolland <qrolland@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/14 21:29:07 by qrolland          #+#    #+#             */
-/*   Updated: 2023/04/14 21:44:14 by qrolland         ###   ########.fr       */
+/*   Updated: 2023/04/17 17:32:02 by qrolland         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,14 +44,14 @@ int	check_str_numeric(char *str)
 	int		i;
 
 	i = 0;
-	while ((*str == ' ') || (*str >= '\t' && *str <= '\r'))
-		str++;
-	if (*str == '-' || *str == '+')
+	while ((str[i] == ' ') || (str[i] >= '\t' && str[i] <= '\r'))
 		i++;
-	while (*str)
+	if (str[i] == '-' || str[i] == '+')
+		i++;
+	while (str[i])
 	{
 		if (!((str[i] == ' ') || (str[i] >= '\t' && str[i] <= '\r'))
-			&& !ft_isdigit(*str))
+			&& !ft_isdigit(str[i]))
 			return (0);
 		i++;
 	}
@@ -86,7 +86,9 @@ int	exit_builtin(t_data *data, char **strs)
 			data->status = error_cmd("exit", strs[1],
 					"numeric argument required", 2);
 		else if (strs[2])
+		{
 			return (error_cmd("exit", NULL, "too many arguments", 1));
+		}
 	}
 	exit_shell(data);
 	return (2);

@@ -1,3 +1,14 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   exec_child.c                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: afelten <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/04/17 14:51:00 by afelten           #+#    #+#             */
+/*   Updated: 2023/04/17 14:51:04 by afelten          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "minishell.h"
 
@@ -32,7 +43,7 @@ int	execute_env_cmd(t_data *data, t_command *command)
 	if (!path)
 	{
 		free(cmd);
-		return (0);
+		return (1);
 	}
 	cmd = get_cmd_path(data, path, cmd);
 	if (!cmd)

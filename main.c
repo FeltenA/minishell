@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: afelten <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: qrolland <qrolland@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/11 14:13:10 by afelten           #+#    #+#             */
-/*   Updated: 2023/04/11 14:13:14 by afelten          ###   ########.fr       */
+/*   Updated: 2023/04/17 17:35:52 by qrolland         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,44 +25,6 @@ int	check_line(char *line)
 	}
 	return (1);
 }
-
-/*
-void	print_tokens(t_data *data)
-{
-	t_token	*token;
-
-	token = data->tokens;
-	while (token)
-	{
-		printf("%s : %d\n", token->str, token->type);
-		token = token->next;
-	}
-}
-
-void	print_cmd(t_data *data)
-{
-	t_command	*cmd;
-	char		**str;
-
-	cmd = data->commands;
-	while (cmd)
-	{
-		if (cmd->str)
-			printf("%s\n", cmd->str);
-		str = cmd->args;
-		while (str)
-		{
-			printf("%s ", *str);
-			str++;
-		}
-		printf("\n");
-		printf("%s : %d\n", cmd->io_data.infile, cmd->io_data.in_fd);
-		if (cmd->io_data.heredoc_del)
-			printf("%s\n", cmd->io_data.heredoc_del);
-		printf("%s : %d\n", cmd->io_data.outfile, cmd->io_data.out_fd);
-		cmd = cmd->next;
-	}
-}*/
 
 void	use_input(t_data *data)
 {
@@ -100,8 +62,11 @@ int	main(int argc, char *argv[], char **env)
 {
 	t_data	data;
 
-	(void)argc;
 	(void)argv;
+	if (!isatty(0))
+		ft_error("Error: fd input not a terminal");
+	if (argc > 1)
+		ft_error("Error: too many arguments");
 	if (!init_data(&data, env))
 		return (1);
 	minishell_inter(&data);

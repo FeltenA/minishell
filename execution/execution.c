@@ -1,3 +1,14 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   execution.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: afelten <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/04/17 14:51:26 by afelten           #+#    #+#             */
+/*   Updated: 2023/04/17 14:51:31 by afelten          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "minishell.h"
 
@@ -90,18 +101,18 @@ int	execution(t_data *data)
 		return (0);
 	while (cmd)
 	{
-		if (!cmd->str)
+		if (cmd->str)
 		{
-			cmd = cmd->next;
-			continue ;
+			pid = fork();
+			if (pid == -1)
+				return (perror_return(data, "fork: "));
+			else if (pid == 0)
+				execute_command(data, cmd);
 		}
-		pid = fork();
-		if (pid == -1)
-			return (perror_return(data, "fork: "));
-		else if (pid == 0)
-			execute_command(data, cmd);
 		cmd = cmd->next;
 	}
-	data->status = wait_children(data);
+	if (data->commands->str
+		&& (!is_builtin(data->commands->str) || data->commands->next))
+		data->status = wait_children(data);
 	return (1);
 }

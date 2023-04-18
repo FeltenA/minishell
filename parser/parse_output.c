@@ -22,7 +22,7 @@ void	free_output(t_command *command)
 	command->io_data.out_fd = -1;
 }
 
-int	parse_append(t_command *command, t_token **token, t_data *data)
+int	parse_trunc(t_command *command, t_token **token, t_data *data)
 {
 	if (!init_parse_io(command, token, 0, data))
 		return (0);
@@ -38,7 +38,7 @@ int	parse_append(t_command *command, t_token **token, t_data *data)
 	return (1);
 }
 
-int	parse_trunc(t_command *command, t_token **token, t_data *data)
+int	parse_append(t_command *command, t_token **token, t_data *data)
 {
 	if (!init_parse_io(command, token, 0, data))
 		return (0);

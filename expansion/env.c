@@ -18,15 +18,16 @@ char	*get_var_env(t_data *data, char *var)
 	int		j;
 	char	*val;
 
-	i = 0;
-	if (var[i] && var[i] == '?')
+	if (var[0] && var[0] == '?')
 		return (ft_itoa(data->status));
-	while (var[i] && (ft_isalnum(var[i]) || var[i] == '_'))
-		i++;
 	j = 0;
 	while (data->env[j])
 	{
-		if (!ft_strncmp(data->env[j], var, i))
+		i = 0;
+		while (data->env[j] && data->env[j][i] && data->env[j][i] != '=')
+			i++;
+		if (!ft_strncmp(data->env[j], var, i) && (!var[i]
+				|| (!ft_isalnum(var[i]) && var[i] != '_')))
 		{
 			val = ft_strdup(data->env[j] + i + 1);
 			if (!val)
@@ -59,16 +60,17 @@ int	get_var_size(t_data *data, char *var)
 	int		j;
 	int		size;
 
-	i = 0;
 	size = 0;
-	if (var[i] && var[i] == '?')
+	if (var[0] && var[0] == '?')
 		return (get_int_size(data->status));
-	while (var[i] && (ft_isalnum(var[i]) || var[i] == '_'))
-		i++;
 	j = 0;
 	while (data->env[j])
 	{
-		if (!ft_strncmp(data->env[j], var, i))
+		i = 0;
+		while (data->env[j] && data->env[j][i] && data->env[j][i] != '=')
+			i++;
+		if (!ft_strncmp(data->env[j], var, i) && (!var[i]
+				|| (!ft_isalnum(var[i]) && var[i] != '_')))
 		{
 			while (*(data->env[j] + i + 1 + size))
 				size++;

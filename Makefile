@@ -41,7 +41,7 @@ LIBFT	= ./libft/libft.a
 
 INC		= -I ./includes -I ./libft
 
-CC		= cc -g
+CC		= cc
 
 RM		= rm -f
 
@@ -50,14 +50,13 @@ CFLAGS	= -Wall -Wextra -Werror
 %.o:		%.c
 		${CC} ${CFLAGS} -c $< -o $@ ${INC}
 
-all:		${LIBFT}
-		make ${NAME}
+all:	${NAME}
 
 ${LIBFT}:
 		@make all -C libft
 		@make bonus -C libft
 
-${NAME}:	${OBJS}
+${NAME}:	${LIBFT} ${OBJS}
 		${CC} ${OBJS} -o ${NAME} ${INC} ${LIBFT} -l readline
 
 clean:
