@@ -49,7 +49,10 @@ int	minishell_inter(t_data *data)
 		set_signals_interactive();
 		data->line = readline("minishell> ");
 		if (!data->line)
+		{
+			ft_putendl_fd("exit", 2);
 			exit_shell(data);
+		}
 		if (!data->line[0] || check_line(data->line))
 			continue ;
 		set_signals_noninteractive();

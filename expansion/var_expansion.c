@@ -25,9 +25,19 @@ static int	check_var(char *str, t_exp_var *values)
 			values->status = set_quote_status(values->status, str[i]);
 		else if (str[i] == '$' && (ft_isalpha(str[i + 1]) || str[i + 1] == '_'
 				|| str[i + 1] == '?') && values->status != SQUOTE)
+		{
+			values->start = i + values->pos;
+			i += 2;
+			if (str[i - 1] != '?')
+				while (ft_isalnum(str[i]))
+					i++;
+			values->end = i + values->pos;
 			return (1);
+		}
 		i++;
 	}
+	values->start = 0;
+	values->end = 0;
 	return (0);
 }
 
@@ -51,12 +61,12 @@ void	get_index_var(char *str, t_exp_var *values)
 				while (ft_isalnum(str[i]))
 					i++;
 			values->end = i + values->pos;
+			printf("%d:%d\n", values->start, values->end);
 			return ;
 		}
 		i++;
 	}
-	values->start = 0;
-	values->end = 0;
+	
 }
 
 int	replace_var(char **str, char *var, int start, int end)
@@ -92,7 +102,6 @@ char	**replace_first_var(t_exp_var *values)
 	int		len_args;
 
 	len_args = ft_strs_len(values->args);
-	get_index_var(values->args[len_args - 1] + values->pos, values);
 	var = get_var_env(values->data,
 			values->args[len_args - 1] + values->start + 1);
 	if (!var)

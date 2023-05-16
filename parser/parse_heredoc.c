@@ -32,7 +32,7 @@ int	fill_heredoc(int fd, char *del, int quotes, t_data *data)
 	char	*line;
 
 	line = readline("heredoc> ");
-	while (line && ft_strncmp(del, line, ft_strlen(line)))
+	while (line && ft_strncmp(del, line, ft_strlen(line) + 1))
 	{
 		if (!replace_var_heredoc(&line, quotes, data))
 		{
